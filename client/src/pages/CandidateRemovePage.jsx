@@ -36,14 +36,14 @@ const CandidateRemovePage = () => {
     const fetchElection = async () => {
       try {
         const res = await axios.get(
-          `https://voteverse-server.onrender.com/api/elections/id/${electionId}`,
+          `/api/v2/elections/id/${electionId}`,
           { withCredentials: true }
         );
         const election = res.data.election;
         setCandidates(election.candidates || []);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to load candidates.");
+        toast.error(error.response?.data?.message || "Failed to load candidates.");
       } finally {
         setLoading(false);
       }
@@ -71,7 +71,7 @@ const CandidateRemovePage = () => {
 
     try {
       const res = await axios.delete(
-  `https://voteverse-server.onrender.com/api/elections/${electionId}/candidates/${candidateToRemove._id}`,
+  `/api/v2/elections/${electionId}/candidates/${candidateToRemove._id}`,
   {
     data: { candidateId: candidateToRemove._id , electionId: electionId },
     withCredentials: true,

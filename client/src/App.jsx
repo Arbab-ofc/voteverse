@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -11,12 +11,9 @@ import NotFound from './pages/NotFound';
 import OtpVerification from './pages/OtpVerification';
 import { useAuth } from './context/AuthContext';
 import CreateElection from './pages/CreateElection';
-import AddCandidatePage from './pages/AddCandidatePage';
 import CandidateList from './pages/CandidateList';
-import DeleteElectionCard from './pages/DeleteElectionCard';
 import UpdateElection from './pages/UpdateElection';
-import CandidateRemovePage from './pages/CandidateRemovePage';
-import ElectionEndPage from './pages/ElectionEndPage';
+import ManageElection from './pages/ManageElection';
 import ElectionResultPage from './pages/ElectionResultPage';
 import MyProfile from './pages/MyProfile';
 import ChangePassword from './pages/ChangePassword';
@@ -24,9 +21,11 @@ import ForgetPassword from './pages/ForgetPassword';
 import ResetPassword from './pages/ResetPassword';
 import ElectionDetailedCard from './components/ElectionDetailedCard';
 import ResendOtp from './pages/ResendOtp';
+import AdminPortal from './pages/AdminPortal';
 
 function App() {
   const { user } = useAuth();
+  const redirectIfAuthed = (element) => (user ? <Navigate to="/dashboard" replace /> : element);
   return (
     <Router>
       <div className="min-h-screen flex flex-col">
@@ -36,18 +35,16 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            <Route path="/login" element={redirectIfAuthed(<Login />)} />
+            <Route path="/register" element={redirectIfAuthed(<Register />)} />
             <Route path="verify-otp" element={<OtpVerification />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/about" element={<About />} />
             <Route path="/create-election" element={<CreateElection />} />
-            <Route path="/add-candidate" element={<AddCandidatePage />} />
             <Route path="/candidates" element={<CandidateList />} />
-            <Route path="/delete-election" element={<DeleteElectionCard />} />
+            <Route path="/vote/:electionId" element={<CandidateList />} />
             <Route path="/update-election" element={<UpdateElection />} />
-            <Route path="/remove-candidate" element={<CandidateRemovePage />} />
-            <Route path="/end-election" element={<ElectionEndPage />} />
+            <Route path="/manage-election" element={<ManageElection />} />
             <Route path="/election-result" element={<ElectionResultPage />} />
             <Route path="/my-profile" element={<MyProfile />} />
             <Route path="/change-password" element={<ChangePassword />} />
@@ -55,6 +52,7 @@ function App() {
             <Route path="/verify-forget-otp" element={<ResetPassword />} />
             <Route path="/election-details/:electionId" element={<ElectionDetailedCard />} />
             <Route path="/resend-otp" element={<ResendOtp />} />
+            <Route path="/admin" element={<AdminPortal />} />
             <Route path="*" element={<NotFound />} /> 
           </Routes>
         </main>

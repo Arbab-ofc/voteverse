@@ -1,9 +1,96 @@
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 
+:root {
+  --vv-ink: #0b0f17;
+  --vv-ink-2: #101826;
+  --vv-sand: #f5f1e8;
+  --vv-ember: #ff6b3d;
+  --vv-sage: #7bd5c2;
+  --vv-gold: #f3c969;
+}
+
+body {
+  font-family: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--vv-ink);
+  background: var(--vv-sand);
+}
+
+.font-display {
+  font-family: "Space Grotesk", "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
 .animate-slideIn {
-   animation: slideIn 0.3s ease forwards;
- }
- @keyframes slideIn {
-   0% { transform: translateY(-10%); opacity: 0; }
-  100% { transform: translateY(0); opacity: 1; }
+  animation: slideIn 0.3s ease forwards;
+}
+
+@keyframes slideIn {
+  0% {
+    transform: translateY(-10%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.Toastify__toast-container {
+  width: min(360px, 92vw);
+  padding: 1rem;
+}
+
+.Toastify__toast {
+  border-radius: 18px;
+  background: #ffffff !important;
+  color: var(--vv-ink);
+  border: 1px solid rgba(16, 24, 38, 0.12);
+  box-shadow: 0 16px 40px rgba(16, 24, 38, 0.15);
+  padding: 14px 16px;
+}
+
+.Toastify__toast-theme--colored {
+  background: #ffffff !important;
+  color: var(--vv-ink) !important;
+}
+
+.Toastify__toast-body {
+  font-family: "Instrument Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.Toastify__toast-theme--colored .Toastify__toast-body {
+  color: var(--vv-ink);
+}
+
+.Toastify__close-button {
+  color: var(--vv-ink-2);
+  opacity: 0.6;
+}
+
+.Toastify__close-button:hover {
+  opacity: 1;
+}
+
+.Toastify__progress-bar {
+  height: 3px;
+  border-radius: 999px;
+}
+
+.Toastify__toast--success {
+  border-left: 5px solid var(--vv-sage);
+}
+
+.Toastify__toast--error {
+  border-left: 5px solid #e5484d;
+}
+
+.Toastify__toast--warning {
+  border-left: 5px solid var(--vv-gold);
+}
+
+.Toastify__toast--info {
+  border-left: 5px solid var(--vv-ember);
 }

@@ -32,13 +32,13 @@ const ElectionEndPage = () => {
     const fetchElection = async () => {
       try {
         const res = await axios.get(
-          `https://voteverse-server.onrender.com/api/elections/id/${electionId}`,
+          `/api/v2/elections/id/${electionId}`,
           { withCredentials: true }
         );
         setElection(res.data.election);
       } catch (error) {
         console.error(error);
-        toast.error("Failed to load election details.");
+        toast.error(error.response?.data?.message || "Failed to load election details.");
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,7 @@ const ElectionEndPage = () => {
     setEnding(true);
     try {
       const res = await axios.put(
-        `https://voteverse-server.onrender.com/api/elections/end/${electionId}`,
+        `/api/v2/elections/end/${electionId}`,
         {},
         { withCredentials: true }
       );

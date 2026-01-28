@@ -21,11 +21,11 @@ export default function AddCandidatePage() {
     setIsSubmitting(true);
     try {
       const res = await axios.post(
-        'https://voteverse-server.onrender.com/api/candidates/add-candidate',
+        '/api/v2/candidates/add-candidate',
         { ...formData, electionId },
         { withCredentials: true }
       );
-      toast.success('Candidate created successfully');
+      toast.success(res.data?.message || 'Candidate created successfully');
       setFormData({ name: '', bio: '' });
     } catch (error) {
       console.error(error);

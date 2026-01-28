@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Home, Mail, Info, LogIn, UserPlus, LayoutDashboard, LogOut, User } from "lucide-react";
-import { Typewriter } from "react-simple-typewriter";
+import { Menu, X, Mail, Info, LogIn, UserPlus, LayoutDashboard, LogOut, User } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { useAuth } from "../context/AuthContext"; 
+import { useAuth } from "../context/AuthContext";
 
 const Header = ({ isAuthenticated }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  const { setUser, user } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
-      if (window.innerWidth >= 768) setMenuOpen(false);
+      if (window.innerWidth >= 1024) setMenuOpen(false);
     };
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
@@ -22,116 +21,149 @@ const Header = ({ isAuthenticated }) => {
 
   const handleLogout = async () => {
     try {
-      await axios.post("https://voteverse-server.onrender.com/api/users/logout", {}, { withCredentials: true });
+      const res = await axios.post("/api/v2/users/logout", {}, { withCredentials: true });
       setUser(null);
-      toast.success("Logged out successfully");
+      toast.success(res?.data?.message || "Logged out successfully");
       navigate("/login");
     } catch (error) {
-      toast.error("Logout failed");
+      toast.error(error?.response?.data?.message || "Logout failed");
     }
   };
 
   const navItems = [
-    { name: "Home", path: "/", icon: <Home /> },
-    { name: "Contact Us", path: "/contact", icon: <Mail /> },
-    { name: "About", path: "/about", icon: <Info /> },
+    { name: "Contact", path: "/contact", icon: <Mail className="h-4 w-4" /> },
+    { name: "About", path: "/about", icon: <Info className="h-4 w-4" /> },
     isAuthenticated
-      ? { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard /> }
-      : { name: "Login", path: "/login", icon: <LogIn /> },
+      ? { name: "Dashboard", path: "/dashboard", icon: <LayoutDashboard className="h-4 w-4" /> }
+      : { name: "Login", path: "/login", icon: <LogIn className="h-4 w-4" /> },
     isAuthenticated
-      ? { name: "My Profile", path: "/my-profile", icon: <User /> } 
+      ? { name: "My Profile", path: "/my-profile", icon: <User className="h-4 w-4" /> }
       : null,
-    isAuthenticated
-      ? { name: "Logout", path: "#", icon: <LogOut />, onClick: handleLogout }
-      : { name: "Register", path: "/register", icon: <UserPlus /> },
-  ].filter(Boolean); 
+    user?.isAdmin
+      ? { name: "Admin", path: "/admin", icon: <LayoutDashboard className="h-4 w-4" /> }
+      : null,
+  ].filter(Boolean);
 
   return (
-    <header className="w-full bg-gradient-to-r from-black via-gray-900 to-black text-white shadow-md fixed top-0 left-0 z-50">
-      <div className="flex items-center justify-between px-6 py-4">
-        <h1 className="text-2xl font-bold tracking-widest">
-          <Typewriter
-            words={["V O T E  V E R S E", "Empowering Democracy"]}
-            loop={0}
-            cursor
-            cursorStyle="."
-            typeSpeed={120}
-            deleteSpeed={70}
-          />
-        </h1>
+    <header className="fixed top-0 left-0 z-50 w-full">
+      <div className="bg-white/80 backdrop-blur-xl border-b border-black/10">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link to="/" className="flex items-center gap-2">
+            <span className="h-2 w-2 rounded-full bg-[var(--vv-ember)]" />
+            <span className="font-display text-lg font-semibold tracking-[0.2em] text-[var(--vv-ink)]">
+              VOTEVERSE
+            </span>
+          </Link>
 
-        <div className="md:hidden">
-          <button onClick={() => setMenuOpen(!menuOpen)}>
-            {menuOpen ? <X className="w-7 h-7 text-white" /> : <Menu className="w-7 h-7 text-white" />}
+          <nav className="hidden items-center gap-2 lg:flex">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                className={`rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+                  location.pathname === item.path
+                    ? "bg-[var(--vv-ink)] text-white"
+                    : "text-[var(--vv-ink)] hover:bg-black/5"
+                }`}
+              >
+                {item.name}
+              </Link>
+            ))}
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="rounded-full border border-black/10 px-4 py-2 text-sm font-semibold text-[var(--vv-ink)] hover:bg-black/5"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                to="/register"
+                className="rounded-full bg-[var(--vv-ink)] px-4 py-2 text-sm font-semibold text-white"
+              >
+                Get started
+              </Link>
+            )}
+          </nav>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen(true)}
+            className="lg:hidden rounded-full border-2 border-black/80 bg-white p-2 text-[var(--vv-ink)] shadow-[4px_4px_0_#111827] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#111827]"
+          >
+            <Menu className="h-5 w-5" />
           </button>
         </div>
-
-        
-        <nav className="hidden md:flex gap-6 text-white text-lg font-medium">
-          {navItems.map((item, index) =>
-            item.name === "Logout" ? (
-              <button
-                key={index}
-                onClick={item.onClick}
-                className="hover:text-yellow-300 transition-all duration-300"
-              >
-                <span className="hidden lg:inline">{item.name}</span>
-                <span className="md:inline lg:hidden">{item.icon}</span>
-              </button>
-            ) : (
-              <Link
-                key={index}
-                to={item.path}
-                className={`hover:text-yellow-300 transition-all duration-300 ${
-                  location.pathname === item.path
-                    ? "underline underline-offset-8 decoration-yellow-300"
-                    : ""
-                }`}
-              >
-                <span className="hidden lg:inline">{item.name}</span>
-                <span className="md:inline lg:hidden">{item.icon}</span>
-              </Link>
-            )
-          )}
-        </nav>
       </div>
 
-      
-      {menuOpen && (
-        <div className="md:hidden bg-white text-gray-800 fixed top-0 left-0 w-full h-screen z-40 flex flex-col items-start px-6 py-6 space-y-6 animate-slideIn overflow-y-auto">
-          <div className="flex justify-between items-center w-full">
-            <h2 className="text-xl font-bold text-gray-800">Menu</h2>
-            <button onClick={() => setMenuOpen(false)}>
-              <X className="w-6 h-6 text-gray-600" />
+      <div
+        className={`fixed inset-0 z-50 lg:hidden transition-opacity duration-300 ${
+          menuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+        }`}
+      >
+        <div
+          className={`absolute inset-0 bg-black/40 transition-opacity duration-300 ${
+            menuOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setMenuOpen(false)}
+        />
+        <div
+          className={`absolute right-0 top-0 h-full w-72 bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.28)] transition-transform duration-300 ${
+            menuOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <span className="font-display text-base font-semibold tracking-[0.2em]">VOTEVERSE</span>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              className="rounded-full border-2 border-black/80 bg-white p-2 shadow-[4px_4px_0_#111827] transition hover:-translate-y-0.5 hover:shadow-[6px_6px_0_#111827]"
+            >
+              <X className="h-5 w-5" />
             </button>
           </div>
-          {navItems.map((item, index) =>
-            item.name === "Logout" ? (
+          <div className="mt-8 space-y-2">
+            {navItems.map((item) => (
+              <Link
+                key={item.name}
+                to={item.path}
+                onClick={() => setMenuOpen(false)}
+                className={`flex items-center justify-between rounded-2xl border-2 border-black/80 px-4 py-3 text-sm font-semibold shadow-[6px_6px_0_#111827] transition hover:-translate-y-0.5 hover:shadow-[8px_8px_0_#111827] ${
+                  location.pathname === item.path
+                    ? "bg-[var(--vv-ink)] text-white"
+                    : "bg-[var(--vv-sand)] text-[var(--vv-ink)]"
+                }`}
+              >
+                <span>{item.name}</span>
+                {item.icon}
+              </Link>
+            ))}
+          </div>
+          <div className="mt-6 space-y-3">
+            {isAuthenticated ? (
               <button
-                key={index}
+                type="button"
                 onClick={() => {
-                  item.onClick();
+                  handleLogout();
                   setMenuOpen(false);
                 }}
-                className="block text-base font-medium w-full py-2 border-b border-gray-200 text-left"
+                className="w-full rounded-full border-2 border-black/80 px-4 py-2 text-sm font-semibold text-[var(--vv-ink)] shadow-[6px_6px_0_#111827] transition hover:-translate-y-0.5 hover:shadow-[8px_8px_0_#111827]"
               >
-                {item.name}
+                Logout
               </button>
             ) : (
               <Link
-                key={index}
-                to={item.path}
+                to="/register"
                 onClick={() => setMenuOpen(false)}
-                className={`block text-base font-medium w-full py-2 border-b border-gray-200 ${
-                  location.pathname === item.path ? "text-gray-900 font-semibold" : "hover:text-gray-700"
-                }`}
+                className="block w-full rounded-full border-2 border-black/80 bg-[var(--vv-ink)] px-4 py-2 text-center text-sm font-semibold text-white shadow-[6px_6px_0_#111827] transition hover:-translate-y-0.5 hover:shadow-[8px_8px_0_#111827]"
               >
-                {item.name}
+                Create account
               </Link>
-            )
-          )}
+            )}
+          </div>
         </div>
-      )}
+      </div>
     </header>
   );
 };
